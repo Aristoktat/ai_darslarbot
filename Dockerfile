@@ -12,4 +12,4 @@ COPY . .
 
 # Port EXPOSE removed (Render will use $PORT)
 
-CMD ["python", "-m", "app.main"]
+CMD ["python3", "-m", "app.main"]
