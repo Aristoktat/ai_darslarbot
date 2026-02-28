@@ -58,6 +58,10 @@ async def start_web_server():
 
 async def main():
     logger.info("Initializing bot application...")
+    
+    # Start web server for health check immediately
+    await start_web_server()
+
     # Initialize DB
     await init_db()
 
@@ -79,10 +83,7 @@ async def main():
         BotCommand(command="help", description="Yordam"),
     ])
 
-    logger.info("Starting web server and bot polling...")
-    
-    # Start web server
-    await start_web_server()
+    logger.info("Bot application ready. Starting polling...")
 
     try:
         # Start bot polling

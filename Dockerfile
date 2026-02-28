@@ -10,7 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-# Expose port (Render will use $PORT anyway)
-EXPOSE 8080
+# Port EXPOSE removed (Render will use $PORT)
 
 CMD ["python", "-m", "app.main"]

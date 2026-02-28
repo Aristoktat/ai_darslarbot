@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     CURRENCY: str = "UZS"
 
     # WEB SERVER (for keep-alive)
-    PORT: int = 8080
+    PORT: int = 10000
 
     class Config:
         env_file = ".env"
