@@ -50,10 +50,10 @@ def get_settings_keyboard():
 async def admin_panel(message: Message, state: FSMContext):
     logging.info(f"Admin access attempt by user_id: {message.from_user.id}")
     if not is_admin(message.from_user.id):
-        await message.answer(f"Siz admin emassiz. Sizning ID: `{message.from_user.id}`", parse_mode="Markdown")
+        await message.answer(f"Siz admin emassiz. Sizning ID: <code>{message.from_user.id}</code>", parse_mode="HTML")
         return
     await state.clear()
-    await message.answer("🛠 **Admin Dashboard**\n\nBoshqaruv elementini tanlang:", reply_markup=get_admin_keyboard(), parse_mode="Markdown")
+    await message.answer("🛠 <b>Admin Dashboard</b>\n\nBoshqaruv elementini tanlang:", reply_markup=get_admin_keyboard(), parse_mode="HTML")
 
 @router.callback_query(F.data == "admin_cancel_state")
 async def admin_cancel_state(callback: CallbackQuery, state: FSMContext):
@@ -63,23 +63,23 @@ async def admin_cancel_state(callback: CallbackQuery, state: FSMContext):
 @router.callback_query(F.data == "admin_back_main")
 async def admin_back_main(callback: CallbackQuery, state: FSMContext):
     await state.clear()
-    await callback.message.edit_text("🛠 **@ai_darslarbot Admin Dashboard**", reply_markup=get_admin_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text("🛠 <b>Admin Dashboard</b>", reply_markup=get_admin_keyboard(), parse_mode="HTML")
 
 @router.callback_query(F.data == "admin_settings_menu")
 async def admin_settings_menu(callback: CallbackQuery):
-    await callback.message.edit_text("⚙️ **Tariflar va Videolarni sozlash**", reply_markup=get_settings_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text("⚙️ <b>Tariflar va Videolarni sozlash</b>", reply_markup=get_settings_keyboard(), parse_mode="HTML")
 
 # --- Add Plan Flow ---
 @router.callback_query(F.data == "admin_add_plan_start")
 async def add_plan_start(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AddPlanStates.waiting_for_name)
-    await callback.message.edit_text("📝 **Yangi tarif nomini kiriting:**\n(Masalan: VIP Obuna)", reply_markup=get_cancel_kb(), parse_mode="Markdown")
+    await callback.message.edit_text("📝 <b>Yangi tarif nomini kiriting:</b>\n(Masalan: VIP Obuna)", reply_markup=get_cancel_kb(), parse_mode="HTML")
 
 @router.message(AddPlanStates.waiting_for_name)
 async def add_plan_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
     await state.set_state(AddPlanStates.waiting_for_days)
-    await message.answer("📅 **Obuna davomiyligini kiriting (kunlarda):**\n(Umrbod bo'lsa 0 deb yozing)", reply_markup=get_cancel_kb(), parse_mode="Markdown")
+    await message.answer("📅 <b>Obuna davomiyligini kiriting (kunlarda):</b>\n(Umrbod bo'lsa 0 deb yozing)", reply_markup=get_cancel_kb(), parse_mode="HTML")
 
 @router.message(AddPlanStates.waiting_for_days)
 async def add_plan_days(message: Message, state: FSMContext):
@@ -88,7 +88,7 @@ async def add_plan_days(message: Message, state: FSMContext):
         return
     await state.update_data(days=int(message.text))
     await state.set_state(AddPlanStates.waiting_for_price)
-    await message.answer("💰 **Tarif narxini kiriting (faqat raqam, so'mda):**\n(Masalan: 50000)", reply_markup=get_cancel_kb(), parse_mode="Markdown")
+    await message.answer("💰 <b>Tarif narxini kiriting (faqat raqam, so'mda):</b>\n(Masalan: 50000)", reply_markup=get_cancel_kb(), parse_mode="HTML")
 
 @router.message(AddPlanStates.waiting_for_price)
 async def add_plan_price(message: Message, state: FSMContext):
@@ -106,19 +106,19 @@ async def add_plan_price(message: Message, state: FSMContext):
         await session.commit()
     
     await state.clear()
-    await message.answer(f"✅ **Tarif muvaffaqiyatli qo'shildi!**\n\nNomi: {data['name']}\nDavomiyligi: {data['days']} kun\nNarxi: {message.text} so'm", reply_markup=get_admin_keyboard(), parse_mode="Markdown")
+    await message.answer(f"✅ <b>Tarif muvaffaqiyatli qo'shildi!</b>\n\nNomi: {data['name']}\nDavomiyligi: {data['days']} kun\nNarxi: {message.text} so'm", reply_markup=get_admin_keyboard(), parse_mode="HTML")
 
 # --- Add Video Flow ---
 @router.callback_query(F.data == "admin_add_video_start")
 async def add_video_start(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AddVideoStates.waiting_for_video)
-    await callback.message.edit_text("🎥 **Videoni yuboring:**\n(Yoki boshqa kanaldan forward qiling)", reply_markup=get_cancel_kb(), parse_mode="Markdown")
+    await callback.message.edit_text("🎥 <b>Videoni yuboring:</b>\n(Yoki boshqa kanaldan forward qiling)", reply_markup=get_cancel_kb(), parse_mode="HTML")
 
 @router.message(AddVideoStates.waiting_for_video, F.video)
 async def add_video_file(message: Message, state: FSMContext):
     await state.update_data(file_id=message.video.file_id)
     await state.set_state(AddVideoStates.waiting_for_title)
-    await message.answer("📝 **Video sarlavhasini kiriting:**", reply_markup=get_cancel_kb(), parse_mode="Markdown")
+    await message.answer("📝 <b>Video sarlavhasini kiriting:</b>", reply_markup=get_cancel_kb(), parse_mode="HTML")
 
 @router.message(AddVideoStates.waiting_for_title)
 async def add_video_title(message: Message, state: FSMContext):
@@ -131,7 +131,7 @@ async def add_video_title(message: Message, state: FSMContext):
         await session.commit()
     
     await state.clear()
-    await message.answer(f"✅ **Video dars qo'shildi!**\n\nSarlavha: {message.text}", reply_markup=get_admin_keyboard(), parse_mode="Markdown")
+    await message.answer(f"✅ <b>Video dars qo'shildi!</b>\n\nSarlavha: {message.text}", reply_markup=get_admin_keyboard(), parse_mode="HTML")
 
 # --- Stats & Users ---
 @router.callback_query(F.data == "admin_stats_advanced")
@@ -143,13 +143,13 @@ async def show_stats_advanced(callback: CallbackQuery):
         total_revenue = await session.scalar(select(func.sum(Payment.amount))) or 0
         
     text = (
-        f"📊 **Kengaytirilgan Statistika**\n\n"
-        f"👥 Jami foydalanuvchilar: `{user_count}`\n"
-        f"✅ Faol obunalar: `{active_subs}`\n"
-        f"❌ Muddati o'tgan: `{expired_subs}`\n"
-        f"💰 Umumiy tushum: `{total_revenue / 100:,.0f}` so'm\n"
+        f"📊 <b>Kengaytirilgan Statistika</b>\n\n"
+        f"👥 Jami foydalanuvchilar: <code>{user_count}</code>\n"
+        f"✅ Faol obunalar: <code>{active_subs}</code>\n"
+        f"❌ Muddati o'tgan: <code>{expired_subs}</code>\n"
+        f"💰 Umumiy tushum: <code>{total_revenue / 100:,.0f}</code> so'm\n"
     )
-    await callback.message.edit_text(text, reply_markup=get_admin_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=get_admin_keyboard(), parse_mode="HTML")
 
 @router.callback_query(F.data == "admin_user_list")
 async def admin_user_list(callback: CallbackQuery):
@@ -158,17 +158,17 @@ async def admin_user_list(callback: CallbackQuery):
         results = await session.execute(stmt)
         rows = results.all()
         
-    text = "👥 **Oxirgi 15 foydalanuvchi:**\n\n"
+    text = "👥 <b>Oxirgi 15 foydalanuvchi:</b>\n\n"
     for user, sub in rows:
         sub_status = "✅" if sub and sub.is_active else "❌"
-        text += f"{sub_status} {user.full_name or 'No Name'} (`{user.id}`)\n"
+        text += f"{sub_status} {user.full_name or 'No Name'} (<code>{user.id}</code>)\n"
     
-    await callback.message.edit_text(text, reply_markup=get_admin_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=get_admin_keyboard(), parse_mode="HTML")
 
 @router.callback_query(F.data == "admin_broadcast")
 async def start_broadcast(callback: CallbackQuery, state: FSMContext):
     await state.set_state(AdminStates.waiting_for_broadcast)
-    await callback.message.edit_text("📢 **Barcha foydalanuvchilarga yuborilishi kerak bo'lgan xabarni yozing:**\n\n(Har qanday media qabul qilinadi)", reply_markup=get_cancel_kb(), parse_mode="Markdown")
+    await callback.message.edit_text("📢 <b>Barcha foydalanuvchilarga yuborilishi kerak bo'lgan xabarni yozing:</b>\n\n(Har qanday media qabul qilinadi)", reply_markup=get_cancel_kb(), parse_mode="HTML")
 
 @router.message(AdminStates.waiting_for_broadcast)
 async def process_broadcast(message: Message, state: FSMContext):
@@ -189,7 +189,7 @@ async def process_broadcast(message: Message, state: FSMContext):
             success += 1
         except: failed += 1
     
-    await sent_msg.edit_text(f"📢 **Yuborildi!**\n\n✅ {success}\n❌ {failed}", parse_mode="Markdown")
+    await sent_msg.edit_text(f"📢 <b>Yuborildi!</b>\n\n✅ {success}\n❌ {failed}", parse_mode="HTML")
     await message.answer("🛠 Admin Panel", reply_markup=get_admin_keyboard())
 
 @router.callback_query(F.data == "admin_toggle_protection")
@@ -207,7 +207,7 @@ async def toggle_protection(callback: CallbackQuery):
 async def list_plans(callback: CallbackQuery):
     async with async_session() as session:
         plans = (await session.scalars(select(Plan))).all()
-    text = "📋 **Mavjud Tariflar:**\n\n"
+    text = "📋 <b>Mavjud Tariflar:</b>\n\n"
     for p in plans:
         text += f"- {p.name}: {p.duration_days if p.duration_days else 'Umrbod'} kun, {p.price/100:,.0f} so'm\n"
-    await callback.message.edit_text(text, reply_markup=get_settings_keyboard(), parse_mode="Markdown")
+    await callback.message.edit_text(text, reply_markup=get_settings_keyboard(), parse_mode="HTML")
