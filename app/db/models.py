@@ -1,5 +1,6 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+import logging
 from sqlalchemy import BigInteger, String, Integer, Boolean, DateTime, ForeignKey, MetaData, LargeBinary
 from datetime import datetime
 from app.config import settings
