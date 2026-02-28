@@ -191,18 +191,18 @@ async def successful_payment_handler(message: Message):
     try:
         invite_link = await message.bot.create_chat_invite_link(
             chat_id=settings.PRIVATE_GROUP_ID,
-            member_limit=1,
-            name=f"User {message.from_user.id}"
+            creates_join_request=True,
+            name=f"New Member {message.from_user.id}"
         )
         
         from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
         link_kb = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🔗 Guruhga kirish (Bir martalik)", url=invite_link.invite_link)]
+            [InlineKeyboardButton(text="🔗 Guruhga kirish so'rovi", url=invite_link.invite_link)]
         ])
         
-        await message.answer("🎁 Mana guruhga kirish uchun bir martalik havolangiz:", reply_markup=link_kb)
+        await message.answer("🎁 To'lov uchun rahmat! Guruhga kirish uchun pastdagi tugmani bosing va kirish so'rovini yuboring. Bot sizni avtomatik tasdiqlaydi:", reply_markup=link_kb)
     except Exception as e:
-        print(f"Error creating link after payment: {e}")
+        logger.error(f"Error creating link after payment: {e}")
 
 @router.message(F.text == "🎬 Video darslar")
 async def list_videos(message: Message):
@@ -259,16 +259,16 @@ async def group_access_handler(message: Message):
     )
     
     try:
-        # Create 1-time Invite Link
+        # Create Join Request Invite Link (Lock 2)
         invite_link = await message.bot.create_chat_invite_link(
              chat_id=settings.PRIVATE_GROUP_ID,
-             member_limit=1,
+             creates_join_request=True,
              name=f"Access Request {message.from_user.id}"
         )
         
         from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
         kb = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="🔗 Guruhga kirish (Bir martalik)", url=invite_link.invite_link)]
+            [InlineKeyboardButton(text="🔗 Guruhga kirish so'rovi", url=invite_link.invite_link)]
         ])
         
         await message.answer(text, reply_markup=kb, parse_mode="HTML")
