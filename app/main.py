@@ -52,16 +52,29 @@ async def check_expired_subscriptions(bot: Bot):
             except Exception as e:
                 logging.error(f"Failed to kick user {sub.user_id}: {e}")
 
+from aiohttp import web
+
+async def handle_health_check(request):
+    return web.Response(text="Bot is running!")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get("/", handle_health_check)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, "0.0.0.0", settings.PORT)
+    await site.start()
+    logging.info(f"Web server started on port {settings.PORT}")
+
 async def main():
     # Initialize DB
     await init_db()
 
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
-    # Middlewares
-    # Note: Middleware order matters.
-    # dp.message.middleware(ChannelMembershipMiddleware(settings.PUBLIC_CHANNEL_USERNAMES))
-    # dp.callback_query.middleware(ChannelMembershipMiddleware(settings.PUBLIC_CHANNEL_USERNAMES))
+    
+    # Start Web Server for keep-alive
+    await start_web_server()
 
     # Routers
     dp.include_router(admin.router)

@@ -1,4 +1,5 @@
 aiogram>=3.4.1
+aiohttp
 pydantic-settings
 sqlalchemy>=2.0
 asyncpg

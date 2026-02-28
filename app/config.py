@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     PROVIDER_TOKEN: str           # From @BotFather
     CURRENCY: str = "UZS"
 
+    # WEB SERVER (for keep-alive)
+    PORT: int = 8080
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
