@@ -72,7 +72,9 @@ engine = create_async_engine(DATABASE_URL, echo=False)
 async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 async def init_db():
+    logger = logging.getLogger(__name__)
+    logger.info("Initializing database...")
     async with engine.begin() as conn:
-        # For SQLite or dev - create tables. In prod, prefer Alembic migrations.
-        if not settings.USE_POSTGRES:
-             await conn.run_sync(Base.metadata.create_all)
+        # Create all tables if they don't exist
+        await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database initialized successfully.")
