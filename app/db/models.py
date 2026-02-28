@@ -73,9 +73,25 @@ engine = create_async_engine(DATABASE_URL, echo=False)
 async_session = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
 async def init_db():
+    from sqlalchemy import select
     logger = logging.getLogger(__name__)
     logger.info("Initializing database...")
     async with engine.begin() as conn:
         # Create all tables if they don't exist
         await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database initialized successfully.")
+    
+    # Automatic Seeding
+    async with async_session() as session:
+        result = await session.execute(select(Plan))
+        if not result.scalars().first():
+            logger.info("Seeding initial plans...")
+            plans = [
+                Plan(name="1 Oylik", duration_days=30, price=9900000, is_active=True),
+                Plan(name="3 Oylik", duration_days=90, price=24900000, is_active=True),
+                Plan(name="Lifetime", duration_days=None, price=59900000, is_active=True)
+            ]
+            session.add_all(plans)
+            await session.commit()
+            logger.info("Plans seeded successfully.")
+    
+    logger.info("Database initialization complete.")
