@@ -9,12 +9,20 @@ class Settings(BaseSettings):
     
     @field_validator("ADMIN_IDS", mode="before")
     @classmethod
-    def parse_admin_ids(cls, v: Union[str, List[int]]) -> List[int]:
+    def parse_admin_ids(cls, v: Union[str, List[int], int]) -> List[int]:
+        if isinstance(v, int):
+            return [v]
         if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return []
             try:
                 # Try JSON parse first (for [123, 456])
-                return json.loads(v)
-            except json.JSONDecodeError:
+                res = json.loads(v)
+                if isinstance(res, list):
+                    return [int(x) for x in res]
+                return [int(res)]
+            except (json.JSONDecodeError, ValueError):
                 # Fallback to comma split (for 123,456)
                 return [int(x.strip()) for x in v.split(",") if x.strip()]
         return v
