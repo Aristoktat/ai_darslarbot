@@ -65,11 +65,7 @@ async def main():
     bot = Bot(token=settings.BOT_TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
 
-    # 2. Register Middlewares (Mandatory channel check)
-    dp.message.middleware(ChannelMembershipMiddleware(settings.PUBLIC_CHANNEL_USERNAMES))
-    dp.callback_query.middleware(ChannelMembershipMiddleware(settings.PUBLIC_CHANNEL_USERNAMES))
-
-    # 3. Register Routers
+    # Routers
     dp.include_router(admin.router)
     dp.include_router(user.router)
 
